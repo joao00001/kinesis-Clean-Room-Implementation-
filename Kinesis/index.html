@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinesis</title>
+    <link rel="icon" href="example-dark-theme-favico-6a6f6f67bc3e7.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="image-header"><img src="example-dark-theme-favico-6a6f6f67bc3e7-removebg-preview.png"></div>
+            <h1 class="h1">Kinesis</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-label="Página Inicial">
+                <span class="icon"><i class="fa-solid fa-house"></i>Página Inicial</span>
+            </a>
+            <a href="#" class="nav-item" data-label="Explorar">
+                <span class="icon"><i class="fa-solid fa-magnifying-glass"></i>Explorar</span>
+            </a>
+            <a href="#" class="nav-item" data-label="Notificações">
+                <span class="icon"><i class="fa-solid fa-bell"></i>Notificações</span>
+            </a>
+            <a href="#" class="nav-item" data-label="Itens Salvos">
+                <span class="icon"><i class="fa-solid fa-bookmark"></i>Itens Salvos</span>
+            </a>
+            <a href="#" class="nav-item" data-label="Comunidades">
+                <span class="icon"><i class="fa-solid fa-users"></i>Comunidades</span>
+            </a>
+            <a href="#" class="nav-item" data-label="Perfil">
+                <span class="icon"><i class="fa-solid fa-user"></i>Perfil</span>
+            </a>
+            <a href="#" class="nav-item more-menu" data-label="Mais" onclick="toggleMoreMenu(event)">
+                <span class="icon">⋯</span>
+            </a>
+            <ul class="more-submenu" style="display: none;">
+                <li><a href="#" onclick="openEditModal('profile')">Editar Perfil</a></li>
+                <li><a href="#" onclick="openEditModal('password')">Alterar Senha</a></li>
+                <li><a href="#" onclick="openEditModal('privacy')">Privacidade</a></li>
+                <li><a href="#" onclick="openEditModal('deleteAccount')">Excluir Conta</a></li>
+                <li><a href="#" onclick="toggleProfileColumn();">Editar Perfil</a></li>
+                <li><a href="#" onclick="logout()">Sair</a></li>
+            </ul>
+        </nav>
+        <button class="post-button">Postar</button>
+        <div class="user-profile" onclick="showProfilePage(currentUser)">
+            <img src="${currentUser.avatar || 'https://via.placeholder.com/40'}" alt="Avatar do Usuário" class="avatar">
+            <div class="user-info">
+                <span class="username" id="user-info-username">${currentUser.username || 'Visitante'}</span>
+                <span class="handle" id="user-info-handle">${commentUserProfile.handle || `@${comment.username}`}</span>
+            </div>
+            <button class="more-buttons" onclick="toggleMoreMenus(event)">⋯</button>
+            <div class="more-menus" id="more-menus" style="display: none;">
+                <button class="menu-item" onclick="logout(event)">Sair de ${userProfile.handle || `@${currentUser.username}`}</button>
+                <button class="menu-item" onclick="switchAccount(event)">Trocar de conta</button>
+            </div>
+        </div>
+    </aside>
+
+    <div id="notifications-column" class="notifications-column" style="display: none;"></div>
+    <div id="profile-column" class="profile-column" style="display: none;"></div>
+
+    <main class="main-content">
+        <aside class="trending-sidebar">
+            <div class="trending-container">
+                <div class="trending-header">
+                    <h2>O que está acontecendo</h2>
+                    <div id="top-hashtags"></div>
+                </div>
+                <div class="trending-comments">
+                    <h3>Comentários em Destaque</h3>
+                    <div id="top-comments"></div>
+                </div>
+            </div>
+        </aside>
+        <div class="controls">
+            <div class="sort-controls">
+                <label for="sort"></label>
+            </div>
+            <div class="search-controls">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="search" placeholder="Buscar comentários..." oninput="searchComments()">
+            </div>
+            <div class="user-info">
+                <button id="notifications-btn">
+                    <i class="fa-solid fa-bell"></i> (<span id="unread-count">0</span>)
+                </button>                
+                <button id="dark-mode-toggle" title="Alternar Modo Escuro"><i class="fa-solid fa-circle-half-stroke"></i></button>            
+            </div>
+        </div>
+        <div class="add-comment">
+            <img src="https://via.placeholder.com/40" alt="Avatar do Usuário" class="avatar">
+            <div class="comment-input-container">
+                <textarea id="new-comment" placeholder="No que você está pensando?" rows="1"></textarea>
+                <input type="file" id="image-upload" accept="image/*" multiple style="display: none;">
+                <div id="image-preview" class="image-preview" style="display: none;">
+                    <img id="preview-image" src="" alt="Pré-visualização da imagem" style="max-width: 100%; max-height: 200px;">
+                    <button id="remove-image" class="remove-btn"><i class="fa-solid fa-eraser"></i></button>
+                </div>
+                <span id="char-count-new-comment" class="char-count">0/400</span>
+                <div class="comment-actions">
+                    <input type="file" id="image-upload" accept="image/*" style="display: none;">
+                    <button id="upload-image" title="Mídia"><i class="fa-solid fa-photo-film"></i></button>
+                    <button onclick="showPollForm()" title="Criar enquete"><i class="fa-solid fa-chart-simple"></i></button>
+                    <button id="send-comment">Postar</button>
+                </div>
+            </div>
+            <div id="comment-preview" class="comment-preview" style="display: none;"></div>
+        </div>
+        <div class="comments" id="comments"></div>
+
+        <div id="image-modal" class="image-modal" style="display: none;">
+            <div class="modal-contenttt">
+                <button id="modal-close" class="modal-close">✕</button>
+                <div class="modal-image-container">
+                    <div class="image-window">
+                        <img id="modal-image" class="modal-image" src="" alt="Imagem em visualização">
+                    </div>
+                    <button id="modal-prev" class="modal-nav modal-prev" style="display: none;"><i class="fa-solid fa-arrow-left"></i></button>
+                    <button id="modal-next" class="modal-nav modal-next" style="display: none;"><i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+                <div class="modal-controls">
+                    <input type="range" id="zoom-slider" min="0" max="100" value="25" step="1">
+                    <button id="crop-image">Cortar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="notifications-panel" class="notifications-panel"></div>
+    <div id="edit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeEditModal()"><i class="fa-solid fa-circle-xmark"></i></span>
+            <h2 id="modal-title"></h2>
+            <form id="edit-form">
+            </form>
+        </div>
+    </div>
+    <div id="generic-confirmation-modal" class="generic-confirmation-modal" style="display: none;">
+        <div class="generic-confirmation-modal-content">
+            <h3 id="generic-confirmation-modal-title"></h3>
+            <p id="generic-confirmation-modal-message"></p>
+            <div class="generic-confirmation-modal-actions">
+                <button id="generic-confirmation-modal-confirm" class="generic-confirmation-modal-btn generic-confirmation-confirm-btn">Confirmar</button>
+                <button id="generic-confirmation-modal-cancel" class="generic-confirmation-modal-btn generic-confirmation-cancel-btn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <div id="posted-image-modal" style="display: none;">
+        <div class="modal-contentttt">
+            <div class="modal-image-section">
+                <button id="posted-modal-prev" style="display: none;"><i class="fa-solid fa-arrow-right"></i></button>
+                <img id="posted-modal-image" src="" alt="Imagem ampliada">
+                <button id="posted-modal-next" style="display: none;"><i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+            <div class="modal-comments-section">
+                <button id="posted-modal-close"><i class="fa-solid fa-xmark"></i></button>
+                <div id="posted-modal-comments"></div>
+                <div class="modal-comment-input">
+                    <textarea id="posted-modal-comment-input" placeholder="Adicionar um comentário..."></textarea>
+                    <button id="posted-modal-comment-submit">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

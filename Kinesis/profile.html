@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Inclua seu CSS existente -->
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script> <!-- Se estiver usando FontAwesome -->
+</head>
+<body>
+    <div class="main-content">
+        <div class="profile-container"></div>
+    </div>
+    <script src="script.js"></script> <!-- Inclua seu JS existente -->
+    <script>
+        // Código para carregar o perfil na nova página
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('username');
+            if (username) {
+                const targetUser = JSON.parse(localStorage.getItem('users')).find(u => u.username === username) || { username, avatar: "./default-avatar.png" };
+                showProfilePage(targetUser);
+            } else {
+                document.querySelector('.profile-container').innerHTML = '<p>Usuário não encontrado.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

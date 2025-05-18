@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinesis Login</title>
+    <link rel="icon" href="example-dark-theme-favico-6a6f6f67bc3e7.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/umd/uuid.min.js" defer></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(50, 0, 198, 0.64) transparent;
+        }
+
+        body {
+            --background: #fdfdfd;
+            --background-opacity: #fdfdfdbf;
+            --text-color: #1c2526;
+            --tag-bg: #d278ff1d;
+            --tag-color: #68009cd0;
+            --border-color: #e7e9ea;
+            --secondary-bg: #fffffff0;
+            --secondary-text: #333;
+            --hover-bg: #e7e9ea8a;
+            --muted-text: #7c7c7c;
+            --vote-btn1: #aa58d38a;
+            --vote-btn2: #69069b;
+            --standard-purple: #7206a9;
+            --black: #121212;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --linear-gradient-text: linear-gradient(90deg, #000000, #7206a9);
+            background: var(--background);
+            background-size: 100%;
+            color: var(--text-color);
+            transition: all 0.5s ease;
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+            justify-content: center;
+            align-items: anchor-center;
+        }
+
+        body.dark-mode {
+            --background: #1a1a1b;
+            --background-opacity: #1a1a1bdc;
+            --text-color: #d7dadc;
+            --tag-bg: #2c2f33;
+            --tag-color: #00a0f2;
+            --border-color: #2c2f33;
+            --secondary-bg: #1e2124f5;
+            --secondary-text: #d7dadc;
+            --hover-bg: #333639;
+            --muted-text: #a0a0a0;
+            --vote-btn1: #aa00ff;
+            --vote-btn2: #e6b3ff;
+            --box-shadow: 0 4px 20px rgba(255, 255, 255, 0.05);
+            --linear-gradient-text: linear-gradient(90deg, #6ec7ff, #e0a3ff);
+            background: var(--background);
+            background-size: 100%;
+            justify-content: center;
+            align-items: anchor-center;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #1DA1F2, #aa58d3);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #1a91da, #8e44ad);
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: var(--secondary-bg);
+            position: fixed;
+            top: 0;
+            left: 225px;
+            width: 100%;
+            z-index: 1000;
+            animation: fadeIn 0.5s ease-in-out;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--box-shadow);
+            max-width: 600px;
+            max-height: 97vh;
+            border: 1px solid var(--border-color);
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        #dark-mode-toggle {
+            position: absolute;
+            top: 114px;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-color);
+            transition: transform 0.3s ease, color 0.3s ease;
+            padding: 5px;
+        }
+
+        #dark-mode-toggle:hover {
+            transform: scale(1.2);
+            color: var(--standard-purple);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .image-header {
+            background-color: #121212;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            position: fixed;
+            top: 0;
+            margin-bottom: 0px;
+            left: 0;
+            z-index: 1;
+            box-shadow: var(--box-shadow);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        img {
+            height: 70px;
+            width: 70px;
+            vertical-align: middle;
+        }
+
+        .container h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-color);
+            position: relative;
+        }
+
+        .container h1 {
+            text-align: center;
+            margin-bottom: 65px;
+            font-size: 50px;
+            font-weight: 700;
+            color: var(--text-color);
+            position: relative;
+            margin-top: 137px;
+        }
+
+        .container h1::after {
+            content: '';
+            position: absolute;
+            width: 325px;
+            height: 3px;
+            background: linear-gradient(90deg, #162026, #aa58d3);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--secondary-text);
+            transition: color 0.3s ease;
+        }
+
+        .form-group input,
+        .form-group input[type="date"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--secondary-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .form-group input:focus,
+        .form-group input[type="date"]:focus,
+        .form-group textarea:focus {
+            border-color: #aa58d3;
+            box-shadow: 0 0 8px rgba(170, 88, 211, 0.459);
+            outline: none;
+            transform: scale(1.02);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .custom-file-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 8px rgba(170, 88, 211, 0.459);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--standard-purple);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 8px rgba(170, 88, 211, 0.459);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 8px rgba(170, 88, 211, 0.459);
+        }
+
+        button[type="submit"]::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        button[type="submit"]:hover::after {
+            width: 600px;
+            height: 600px;
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .toggle-link a {
+            color: #1DA1F2;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .toggle-link a:hover {
+            color: #aa58d3;
+        }
+
+        .toggle-link a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: #aa58d3;
+            bottom: -4px;
+            left: 0;
+            transition: width 0.3s ease;
+        }
+
+        .toggle-link a:hover::after {
+            width: 100%;
+        }
+
+        .error {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error.active {
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                max-width: 90%;
+                padding: 20px;
+                margin: 20px;
+            }
+            .image-header {
+                padding: 15px;
+            }
+        }
+
+        .custom-file-button {
+            background-color: var(--standard-purple);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-align: center;
+            box-shadow: 0 0 8px rgba(170, 88, 211, 0.459);
+        }
+
+        .form-group .error {
+            text-align: left;
+            margin-top: 5px;
+            margin-bottom: 0;
+        }
+
+        .password-strength-bar {
+            width: 100%;
+            height: 5px;
+            background-color: var(--muted-text);
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .password-strength-bar div {
+            height: 99%;
+            width: 0;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .password-strength-bar.weak div {
+            background-color: #dc3545;
+        }
+
+        .password-strength-bar.medium div {
+            background-color: #ffc107;
+        }
+
+        .password-strength-bar.strong div {
+            background-color: #28a745;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted-text);
+            font-size: 16px;
+        }
+        .toggle-password:hover {
+            color: var(--standard-purple);
+        }
+
+        .image-preview {
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+            justify-self: center;
+            max-block-size: min-content;
+        }
+
+        .site-info {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px;
+            pointer-events: none;
+        }
+
+        .site-info-content {
+            max-width: 500px;
+            text-align: left;
+            color: var(--text-color);
+            pointer-events: auto;
+        }
+
+        .site-info-content h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: var(--text-color);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            justify-self: anchor-center;
+        }
+
+        .site-info-content p {
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--muted-text);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--box-shadow);
+            border-radius: 30px;
+            padding: 20px 13px 20px 13px;
+            background-color: var(--background);
+            backdrop-filter: blur(10px);
+        }
+
+        .site-info-footer {
+            display: flex;
+            gap: 20px;
+            pointer-events: auto;
+            margin-left: 68px;
+        }
+
+        .site-info-footer a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .site-info-footer a:hover {
+            color: var(--standard-purple);
+        }
+
+        h4 {
+            font-size: 24px;
+            color: var(--muted-text);
+        }
+
+        h5 {
+            font-size: 16px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: var(--muted-text);
+        }
+
+        .site-info-content-second {
+            border: 1px solid var(--border-color);
+            box-shadow: var(--box-shadow);
+            border-radius: 30px;
+            padding: 20px 13px 20px 13px;
+            margin-top: 10px;
+            background-color: var(--background);
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width: 800px) {
+            .site-info {
+                padding: 20px;
+            }
+            .site-info-content {
+                max-width: 300px;
+            }
+            .site-info-content h3 {
+                font-size: 22px;
+            }
+            .site-info-content p {
+                font-size: 14px;
+            }
+            .site-info-footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="site-info">
+        <div class="site-info-content">
+            <h3>Bem-vindo ao Kinesis</h3>
+            <p>O Kinesis é uma plataforma inovadora para conectar pessoas, compartilhar ideias e explorar novas possibilidades. Crie seu perfil, personalize sua experiência e junte-se a uma comunidade vibrante!</p>
+            <div class="site-info-content-second">
+                <h4>1. Acesse o site</h4>
+                <h5>Abra a página e veja a tela de login com informações básicas ao fundo.</h5>
+                <h4>2. Login ou Cadastro</h4>
+                <h5>Faça login com email e senha ou clique em "Cadastre-se" para criar uma conta.</h5>
+                <h4>3. Crie Sua Conta</h4>
+                <h5>Preencha os campos (nome, email, senha, fotos, etc.) e clique em "Cadastrar".</h5>
+                <h4>4. Personalize</h4>
+                <h5>Após login, ajuste o tema (claro/escuro) com o botão no topo.</h5>
+                <h4>5. Explore</h4>
+                <h5>Use a plataforma para interagir e acesse links úteis no rodapé.</h5>
+            </div>
+        </div>
+        <div class="site-info-footer">
+            <a href="#">Sobre Nós</a>
+            <a href="#">Contato</a>
+            <a href="#">Termos de Uso</a>
+            <a href="#">Privacidade</a>
+        </div>
+    </div>
+    <div class="container" id="login-container">
+        <div class="image-header">
+            <img src="example-dark-theme-favico-6a6f6f67bc3e7.png">
+        </div>
+        <h1>Kinesis</h1>
+        <button id="dark-mode-toggle"><i class="fas fa-moon"></i></button>
+        <h2>Login</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" required>
+                <div class="error" id="login-email-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Senha</label>
+                <div class="password-wrapper">
+                    <input type="password" id="login-password" required>
+                    <button type="button" class="toggle-password" aria-label="Mostrar senha">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="error" id="login-password-error"></div>
+            </div>
+            <button type="submit">Entrar</button>
+        </form>
+        <div class="toggle-link">
+            <a onclick="toggleForm()">Não tem conta? Cadastre-se</a>
+            <br>
+            <a onclick="showForgotPassword()">Esqueci minha senha</a>
+        </div>
+        <div class="error" id="login-error">Email ou senha incorretos.</div>
+    </div>
+
+    <div class="container" id="register-container" style="display: none;">
+        <div class="image-header">
+            <img src="example-dark-theme-favico-6a6f6f67bc3e7.png">
+        </div>
+        <h1>Kinesis</h1>
+        <button id="dark-mode-toggle"><i class="fas fa-moon"></i></button>
+        <h2>Cadastro</h2>
+        <form id="register-form">
+            <div class="form-group">
+                <label for="register-username">Nome Completo</label>
+                <input type="text" id="register-username" maxlength="30" required>
+                <span class="char-count" id="username-char-count">0/30</span>
+            </div>
+            <div class="form-group">
+                <label for="register-email">Email</label>
+                <input type="email" id="register-email" required>
+                <div class="error" id="email-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="register-handle">Nome de Usuário (@)</label>
+                <input type="text" id="register-handle" maxlength="20" required>
+                <span class="char-count" id="handle-char-count">0/20</span>
+            </div>
+            <div class="form-group">
+                <label for="register-password">Senha</label>
+                <div class="password-wrapper">
+                    <input type="password" id="register-password" required>
+                    <button type="button" class="toggle-password" aria-label="Mostrar senha">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="password-strength-bar" id="password-strength-bar"></div>
+                <div class="error" id="password-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="register-confirm-password">Confirmar Senha</label>
+                <div class="password-wrapper">
+                    <input type="password" id="register-confirm-password" required>
+                    <button type="button" class="toggle-password" aria-label="Mostrar senha">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="error" id="confirm-password-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="register-bio">Bio</label>
+                <textarea id="register-bio" maxlength="160" placeholder="Escreva algo sobre você..."></textarea>
+                <span class="char-count" id="bio-char-count">0/160</span>
+            </div>
+            <div class="form-group">
+                <label>Foto de Perfil *</label>
+                <div class="file-label">
+                    <input type="file" id="register-profile-pic" class="file-input" accept="image/*">
+                    <label for="register-profile-pic" class="custom-file-button"><i class="fa-solid fa-image"></i></label>
+                    <span id="profile-pic-name">Nenhum arquivo escolhido</span>
+                </div>
+                <img id="profile-pic-preview" class="image-preview" style="display: none; max-width: 100px; margin-top: 10px;">
+                <div class="error" id="profile-pic-error"></div>
+            </div>
+            <div class="form-group">
+                <label>Foto de Capa *</label>
+                <div class="file-label">
+                    <input type="file" id="register-cover-pic" class="file-input" accept="image/*">
+                    <label for="register-cover-pic" class="custom-file-button"><i class="fa-solid fa-images"></i></label>
+                    <span id="cover-pic-name">Nenhum arquivo escolhido</span>
+                </div>
+                <div class="error" id="cover-pic-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="register-birthdate">Data de Nascimento</label>
+                <input type="date" id="register-birthdate" required>
+            </div>
+            <button type="submit">Cadastrar</button>
+        </form>
+        <div class="toggle-link">
+            <a onclick="toggleForm()">Já tem conta? Faça login</a>
+        </div>
+        <div class="error" id="register-error">Erro no cadastro. Tente novamente.</div>
+    </div>
+
+    <script>
+        // Alternar entre login e cadastro
+        function toggleForm() {
+            const loginContainer = document.getElementById('login-container');
+            const registerContainer = document.getElementById('register-container');
+            loginContainer.style.display = loginContainer.style.display === 'none' ? 'block' : 'none';
+            registerContainer.style.display = registerContainer.style.display === 'none' ? 'block' : 'none';
+            updateDarkModeToggleIcon();
+        }
+
+        // Carregar usuários do localStorage ou inicializar com lista padrão
+        let users = JSON.parse(localStorage.getItem('users')) || [
+            { id: window.uuid ? window.uuid.v4() : generateFallbackId(), email: "amyrobson@example.com", username: "amyrobson", password: "123456", avatar: "./default-avatar.png", handle: "@amyrobson", bio: "", coverPic: "./default-cover.png", birthdate: "1990-01-01" },
+            { id: window.uuid ? window.uuid.v4() : generateFallbackId(), email: "maxblagun@example.com", username: "maxblagun", password: "123456", avatar: "./default-avatar.png", handle: "@maxblagun", bio: "", coverPic: "./default-cover.png", birthdate: "1992-05-15" },
+            { id: window.uuid ? window.uuid.v4() : generateFallbackId(), email: "ramsesmiron@example.com", username: "ramsesmiron", password: "123456", avatar: "./default-avatar.png", handle: "@ramsesmiron", bio: "", coverPic: "./default-cover.png", birthdate: "1988-12-20" },
+            { id: window.uuid ? window.uuid.v4() : generateFallbackId(), email: "juliusomo@example.com", username: "juliusomo", password: "123456", avatar: "./default-avatar.png", handle: "@juliusomo", bio: "", coverPic: "./default-cover.png", birthdate: "1995-03-10" },
+            { id: window.uuid ? window.uuid.v4() : generateFallbackId(), email: "sarahkane@example.com", username: "sarahkane", password: "123456", avatar: "./default-avatar.png", handle: "@sarahkane", bio: "", coverPic: "./default-cover.png", birthdate: "1993-07-25" }
+        ];
+
+        // Migrar usuários existentes para incluir IDs
+        users = users.map(user => ({
+            ...user,
+            id: user.id || (window.uuid ? window.uuid.v4() : generateFallbackId())
+        }));
+        localStorage.setItem('users', JSON.stringify(users));
+
+        // Fallback ID generator if uuid is not available
+        function generateFallbackId() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Função para normalizar email
+        function normalizeEmail(email) {
+            return email.trim().toLowerCase();
+        }
+
+        // Função para salvar usuários no localStorage com tratamento de erro
+        function saveUsers() {
+            try {
+                localStorage.setItem('users', JSON.stringify(users));
+                console.log('Usuários salvos no localStorage:', users);
+            } catch (e) {
+                if (e.name === 'QuotaExceededError') {
+                    document.getElementById('register-error').textContent = 'Erro: Espaço insuficiente. Tente imagens menores.';
+                    document.getElementById('register-error').style.display = 'block';
+                    throw e;
+                } else {
+                    console.error('Erro ao salvar usuários:', e);
+                    document.getElementById('register-error').textContent = 'Erro ao salvar dados. Tente novamente.';
+                    document.getElementById('register-error').style.display = 'block';
+                }
+            }
+        }
+
+        function showForgotPassword() {
+            const email = prompt('Digite seu email para recuperação de senha:');
+            if (email) {
+                const normalizedEmail = normalizeEmail(email);
+                const user = users.find(u => u.email === normalizedEmail);
+                if (user) {
+                    alert(`Instruções de recuperação enviadas para ${email}. (Funcionalidade simulada)`);
+                    console.log(`Simulando envio de email de recuperação para: ${email}`);
+                } else {
+                    alert('Email não encontrado.');
+                }
+            }
+        }
+
+        // Função para comprimir imagem antes de salvar
+        function compressImage(file, maxWidth, maxHeight, callback) {
+            const img = new Image();
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+                if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                callback(compressedDataUrl);
+            };
+
+            img.onerror = () => {
+                console.error('Erro ao carregar imagem:', file.name);
+                callback(null);
+            };
+            img.src = URL.createObjectURL(file);
+        }
+
+        function setupImagePreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            input.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.style.display = 'none';
+                }
+            });
+        }
+
+        setupImagePreview('register-profile-pic', 'profile-pic-preview');
+        setupImagePreview('register-cover-pic', 'cover-pic-preview');
+
+        // Função para validar email
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Função para validar senha
+        function validatePassword(password) {
+            const minLength = 8;
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+            if (password.length < minLength) return "A senha deve ter pelo menos 8 caracteres.";
+            if (!hasUpperCase) return "A senha deve conter pelo menos uma letra maiúscula.";
+            if (!hasLowerCase) return "A senha deve conter pelo menos uma letra minúscula.";
+            if (!hasNumber) return "A senha deve conter pelo menos um número.";
+            if (!hasSpecialChar) return "A senha deve conter pelo menos um caractere especial (ex.: !@#$%).";
+            return null;
+        }
+
+        // Função para calcular a força da senha
+        function calculatePasswordStrength(password) {
+            let score = 0;
+            const length = password.length;
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+            if (length >= 8) score += 25;
+            if (hasUpperCase) score += 25;
+            if (hasLowerCase) score += 25;
+            if (hasNumber) score += 15;
+            if (hasSpecialChar) score += 10;
+
+            score = Math.min(score, 100);
+
+            const strengthBar = document.getElementById('password-strength-bar');
+            const strengthFill = strengthBar.querySelector('div') || document.createElement('div');
+            if (!strengthBar.contains(strengthFill)) strengthBar.appendChild(strengthFill);
+
+            const meetsMinimumRequirements = length >= 8 && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+
+            if (!meetsMinimumRequirements) {
+                if (score <= 50) {
+                    strengthBar.className = 'password-strength-bar weak';
+                    strengthFill.style.width = `${score}%`;
+                } else {
+                    strengthBar.className = 'password-strength-bar medium';
+                    strengthFill.style.width = `${score}%`;
+                }
+            } else {
+                strengthBar.className = 'password-strength-bar strong';
+                strengthFill.style.width = `${score}%`;
+            }
+
+            return score;
+        }
+
+        // Contadores de caracteres
+        function setupCharCounter(input, counterId, maxLength) {
+            const counter = document.getElementById(counterId);
+            input.addEventListener('input', () => {
+                counter.textContent = `${input.value.length}/${maxLength}`;
+            });
+            counter.textContent = `${input.value.length}/${maxLength}`;
+        }
+
+        setupCharCounter(document.getElementById('register-username'), 'username-char-count', 30);
+        setupCharCounter(document.getElementById('register-handle'), 'handle-char-count', 20);
+        setupCharCounter(document.getElementById('register-bio'), 'bio-char-count', 160);
+
+        // Atualizar nome do arquivo ao selecionar
+        document.getElementById('register-profile-pic').addEventListener('change', function() {
+            document.getElementById('profile-pic-name').textContent = this.files[0]?.name || 'Nenhum arquivo escolhido';
+        });
+        document.getElementById('register-cover-pic').addEventListener('change', function() {
+            document.getElementById('cover-pic-name').textContent = this.files[0]?.name || 'Nenhum arquivo escolhido';
+        });
+
+        // Atualizar força da senha em tempo real
+        document.getElementById('register-password').addEventListener('input', function() {
+            const password = this.value;
+            calculatePasswordStrength(password);
+        });
+
+        // Função para atualizar o ícone do botão de tema
+        function updateDarkModeToggleIcon() {
+            document.querySelectorAll('#dark-mode-toggle').forEach(button => {
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                button.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            });
+        }
+
+        // Configurar o botão de alternância de tema
+        document.querySelectorAll('#dark-mode-toggle').forEach(button => {
+            button.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+                updateDarkModeToggleIcon();
+            });
+        });
+
+        // Carregar tema salvo ao inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+            updateDarkModeToggleIcon();
+        });
+
+        // Login com email
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = normalizeEmail(document.getElementById('login-email').value);
+            const password = document.getElementById('login-password').value;
+            const emailErrorElement = document.getElementById('login-email-error');
+            const passwordErrorElement = document.getElementById('login-password-error');
+            const generalErrorElement = document.getElementById('login-error');
+
+            emailErrorElement.textContent = '';
+            emailErrorElement.style.opacity = '0';
+            passwordErrorElement.textContent = '';
+            passwordErrorElement.style.opacity = '0';
+            generalErrorElement.style.display = 'none';
+
+            console.log('Tentativa de login com email:', email);
+            console.log('Lista de usuários atual:', users);
+
+            const user = users.find(u => normalizeEmail(u.email) === email);
+
+            if (!user) {
+                emailErrorElement.textContent = 'Email não encontrado.';
+                emailErrorElement.style.opacity = '1';
+            } else if (user.password !== password) {
+                passwordErrorElement.textContent = 'Senha incorreta.';
+                passwordErrorElement.style.opacity = '1';
+            } else {
+                const currentUser = {
+                    id: user.id,
+                    email: user.email,
+                    username: user.username,
+                    avatar: user.avatar || './default-avatar.png',
+                    handle: user.handle || `@${user.username}`
+                };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                console.log("Login bem-sucedido:", currentUser);
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Cadastro
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value.trim();
+            const email = normalizeEmail(document.getElementById('register-email').value);
+            let handle = document.getElementById('register-handle').value.trim();
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            const bio = document.getElementById('register-bio').value.trim();
+            const profilePicInput = document.getElementById('register-profile-pic');
+            const coverPicInput = document.getElementById('register-cover-pic');
+            const birthdate = document.getElementById('register-birthdate').value;
+            const emailErrorElement = document.getElementById('email-error');
+            const passwordErrorElement = document.getElementById('password-error');
+            const confirmPasswordErrorElement = document.getElementById('confirm-password-error');
+            const profilePicErrorElement = document.getElementById('profile-pic-error');
+            const coverPicErrorElement = document.getElementById('cover-pic-error');
+            const registerErrorElement = document.getElementById('register-error');
+
+            emailErrorElement.textContent = '';
+            emailErrorElement.style.opacity = '0';
+            passwordErrorElement.textContent = '';
+            passwordErrorElement.style.opacity = '0';
+            confirmPasswordErrorElement.textContent = '';
+            confirmPasswordErrorElement.style.opacity = '0';
+            profilePicErrorElement.textContent = '';
+            profilePicErrorElement.style.opacity = '0';
+            coverPicErrorElement.textContent = '';
+            coverPicErrorElement.style.opacity = '0';
+            registerErrorElement.textContent = '';
+            registerErrorElement.style.display = 'none';
+
+            if (!handle.startsWith('@')) handle = '@' + handle;
+
+            console.log('Tentativa de cadastro com email:', email);
+            console.log('Lista de usuários atual:', users);
+
+            if (username.length > 30 || handle.length > 20) {
+                registerErrorElement.textContent = 'Nome completo ou handle excedem o limite de caracteres.';
+                registerErrorElement.style.display = 'block';
+                return;
+            }
+            if (bio.length > 160) {
+                registerErrorElement.textContent = 'A bio não pode exceder 160 caracteres.';
+                registerErrorElement.style.display = 'block';
+                return;
+            }
+            if (users.some(u => normalizeEmail(u.email) === email)) {
+                emailErrorElement.textContent = 'Este email já está em uso.';
+                emailErrorElement.style.opacity = '1';
+                return;
+            }
+            if (!validateEmail(email)) {
+                emailErrorElement.textContent = 'Por favor, insira um email válido.';
+                emailErrorElement.style.opacity = '1';
+                return;
+            }
+            if (users.some(u => u.handle === handle)) {
+                registerErrorElement.textContent = 'Handle já está em uso.';
+                registerErrorElement.style.display = 'block';
+                return;
+            }
+
+            const passwordError = validatePassword(password);
+            if (passwordError) {
+                passwordErrorElement.textContent = 'Senha inválida: ' + passwordError;
+                passwordErrorElement.style.opacity = '1';
+                return;
+            }
+            if (password !== confirmPassword) {
+                confirmPasswordErrorElement.textContent = 'As senhas não são iguais.';
+                confirmPasswordErrorElement.style.opacity = '1';
+                return;
+            }
+
+            const birthDate = new Date(birthdate);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            if (age < 18) {
+                registerErrorElement.textContent = 'Você deve ter pelo menos 18 anos.';
+                registerErrorElement.style.display = 'block';
+                return;
+            }
+
+            const profilePicFile = profilePicInput.files[0];
+            const coverPicFile = coverPicInput.files[0];
+            if (!profilePicFile) {
+                profilePicErrorElement.textContent = 'Campo obrigatório';
+                profilePicErrorElement.style.opacity = '1';
+                return;
+            }
+            if (!coverPicFile) {
+                coverPicErrorElement.textContent = 'Campo obrigatório';
+                coverPicErrorElement.style.opacity = '1';
+                return;
+            }
+
+            const processFiles = (profilePicFile, coverPicFile) => {
+                const generateId = () => window.uuid ? window.uuid.v4() : generateFallbackId();
+                if (!window.uuid) {
+                    console.warn('UUID library not loaded. Using fallback ID generator.');
+                }
+
+                const newUser = {
+                    id: generateId(),
+                    email: email,
+                    username: username,
+                    password: password,
+                    avatar: null,
+                    handle: handle,
+                    bio: bio,
+                    coverPic: null,
+                    birthdate: birthdate
+                };
+
+                compressImage(profilePicFile, 100, 100, (compressedAvatar) => {
+                    if (compressedAvatar) {
+                        newUser.avatar = compressedAvatar;
+                        compressImage(coverPicFile, 300, 100, (compressedCover) => {
+                            if (compressedCover) {
+                                newUser.coverPic = compressedCover;
+                                finalizeRegistration();
+                            } else {
+                                registerErrorElement.textContent = 'Erro ao processar a foto de capa. Verifique o formato da imagem.';
+                                registerErrorElement.style.display = 'block';
+                            }
+                        });
+                    } else {
+                        registerErrorElement.textContent = 'Erro ao processar a foto de perfil. Verifique o formato da imagem.';
+                        registerErrorElement.style.display = 'block';
+                    }
+                });
+
+                function finalizeRegistration() {
+                    try {
+                        users.push(newUser);
+                        saveUsers();
+                        const currentUser = {
+                            id: newUser.id,
+                            email: newUser.email,
+                            username: newUser.username,
+                            avatar: newUser.avatar,
+                            handle: newUser.handle
+                        };
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        const userProfile = {
+                            id: newUser.id,
+                            points: 0,
+                            badges: [],
+                            bio: newUser.bio,
+                            rawBio: newUser.bio,
+                            profilePic: newUser.avatar,
+                            coverPic: newUser.coverPic,
+                            themeColor: "#1DA1F2",
+                            joinDate: new Date().toISOString(),
+                            following: 0,
+                            followers: 0,
+                            followingList: [],
+                            followersList: [],
+                            visibility: "public",
+                            pendingRequests: [],
+                            savedPosts: [],
+                            hiddenComments: []
+                        };
+                        localStorage.setItem(`userProfile_${newUser.id}`, JSON.stringify(userProfile));
+                        console.log("Cadastro concluído:", currentUser);
+                        window.location.href = 'index.html';
+                    } catch (e) {
+                        console.error('Erro ao finalizar cadastro:', e);
+                        registerErrorElement.textContent = 'Erro ao salvar cadastro. Tente novamente.';
+                        registerErrorElement.style.display = 'block';
+                    }
+                }
+            };
+
+            processFiles(profilePicFile, coverPicFile);
+        });
+
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            button.addEventListener('click', () => {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
+
+        togglePasswordVisibility('login-password', document.querySelector('#login-password + .toggle-password'));
+        togglePasswordVisibility('register-password', document.querySelector('#register-password + .toggle-password'));
+        togglePasswordVisibility('register-confirm-password', document.querySelector('#register-confirm-password + .toggle-password'));
+    </script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9358ff0c1d1b9934',t:'MTc0NTUzMzMxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>
